@@ -1,6 +1,6 @@
 package Audio::Beep;
 
-$Audio::Beep::VERSION = 0.05;
+$Audio::Beep::VERSION = 0.06;
 
 use strict;
 use Carp;

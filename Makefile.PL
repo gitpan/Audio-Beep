@@ -1,11 +1,11 @@
 use ExtUtils::MakeMaker;
 
 my %prereq = ();
-my @libs = ('linux');
+my @libs = ('lib/Audio/Beep/Linux/');
 
 if ($^O =~ /win32/i) {
     $prepreq{'Win32::API'} = 0;
-    @libs = ('win32');
+    @libs = ('lib/Audio/Beep/Win32');
 } elsif ($^O =~ /linux/i) {
     # NOTHING TO DO
 } else {

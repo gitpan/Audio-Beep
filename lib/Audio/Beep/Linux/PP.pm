@@ -1,6 +1,6 @@
 package Audio::Beep::Linux::PP;
 
-$Audio::Beep::Linux::PP::VERSION = 0.05;
+$Audio::Beep::Linux::PP::VERSION = 0.06;
 
 use strict;
 use Carp;
@@ -18,8 +18,7 @@ sub new {
 sub play {
     my $self = shift;
     my ($freq, $duration) = @_;
-    my $old_sigint = $SIG{INT};
-    $SIG{INT} = \&_sigint;
+    local $SIG{INT} = \&_sigint;
     $console = IO::File->new("/dev/console", O_WRONLY) 
         or confess "Cannot open console: $!";
     ioctl($console, KIOCSOUND, int(CLOCK_TICK_RATE / $freq)) 
@@ -28,7 +27,6 @@ sub play {
     ioctl($console, KIOCSOUND, 0)
         or confess "Call to ioctl failed: $!";
     $console->close;
-    $SIG{INT} = $old_sigint;
     return 1;
 }
 
@@ -42,7 +40,7 @@ sub rest {
 sub _sigint {
     if (defined $console) {
         ioctl($console, KIOCSOUND, 0)
-            or croak "Call to ioctl failed: $!";
+            or confess "Call to ioctl failed: $!";
         $console->close;
     }
     exit;

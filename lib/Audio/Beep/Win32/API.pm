@@ -1,6 +1,6 @@
 package Audio::Beep::Win32::API;
 
-$Audio::Beep::Win32::API::VERSION = 0.05;
+$Audio::Beep::Win32::API::VERSION = 0.06;
 
 use strict;
 use Carp;
