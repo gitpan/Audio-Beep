@@ -1,6 +1,6 @@
 package Audio::Beep;
 
-$Audio::Beep::VERSION = 0.08;
+$Audio::Beep::VERSION = 0.10;
 
 use strict;
 use Carp;
@@ -168,8 +168,6 @@ sub _best_player {
         ]
     );
     
-    no strict 'refs';
-    
     for my $mod ( @{ $os_modules{$^O} } ) {
         if (eval "require $mod") {
             my $player = $mod->new();
@@ -185,21 +183,25 @@ sub _player_from_string {
     my $pack = __PACKAGE__;
     $mod =~ s/^(${pack}::)?/${pack}::/;
     eval "require $mod" or croak "Cannot load $mod : $@";
-    no strict 'refs';
     return $mod->new();
 }
 
 
 ### EXPORTED FUNCTIONS
 
+{ #SCOPE FOR CACHED PLAYER
+
+my $player;
+
 sub beep {
     my ($pitch, $duration) = @_;
     $pitch      ||= 440;
     $duration   ||= 100;
-    my $player = _best_player() or croak "Couldn't find a working player";
+    $player ||= _best_player() or croak "Couldn't find a working player";
     $player->play($pitch, $duration);
 }
 
+}
 
 =head1 NAME
 
@@ -424,17 +426,27 @@ will be ignored until end of line.
 
 =head2 Music Examples
 
-    my $scale = <<EOS;
+    my $scale = <<'EOS';
     \rel \bpm144
     c d e f g a b c2. r4    # a scale going up
     c b a g f e d c1        # and then down
     EOS
 
-    my $music = <<EOM; # a Smashing Pumpkins tune
+    my $music = <<'EOM'; # a Smashing Pumpkins tune
     \bpm90 \norel \transpose''
         d8 a, e a, d a, fis16 d a,8
         d  a, e a, d a, fis16 d a,8
     EOM
+
+    my $love_will_tear_us_apart = <<'EOLOVE'; # a happier tune
+    \bpm160
+      d'8 
+        e1      fis4 g8 fis4 e8 d4
+        b2.. d8 a2..            d8
+        e1      fis4 g8 fis4 e8 d4
+        b2.. d8 a1
+    EOLOVE
+
 
 There should be extra examples in the "music" directory of this tarball.
 

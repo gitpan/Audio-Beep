@@ -1,10 +1,20 @@
 Revision history for Perl extension Audio::Beep.
 
+0.10 Sun Apr 06 21:57:12 2003
+    - there was no need for 'no strict "refs"' 
+        in _best_player() and _player_from_string()
+    - added name to tests
+    - added Test::More in dependecies
+    - exported function beep() now uses a cached $player
+    - added single quotes around EOFs in Music Examples in doc
+    - love will tear us apart
+    - we skip 0.09: we don't like it.
+
 0.08 Wed Feb 26 10:23:41 2003
     - In _best_player() we were "trying to club someone to dead 
         with a loaded uzi": now we use bullets (thanks to perlport)
     - Audio::Beep::Win32::API now use native Win32::Sleep
-        (more of a proof of concept)
+        (more a proof of concept than something useful)
     - in Audio::Beep::Linux::PP, $console reduced its scope to the play method 
         (thanks to a closure)
     - now we warn if it's going to install on a non-compatible Windows

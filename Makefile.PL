@@ -1,6 +1,8 @@
 use ExtUtils::MakeMaker;
 
-my %prereq = ();
+my %prereq = (
+    'Test::More'    =>  0
+);
 my @libs = ();
 
 if ($^O eq 'MSWin32') {

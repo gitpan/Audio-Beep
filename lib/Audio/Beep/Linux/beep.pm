@@ -1,6 +1,6 @@
 package Audio::Beep::Linux::beep;
 
-$Audio::Beep::Linux::beep::VERSION = 0.08;
+$Audio::Beep::Linux::beep::VERSION = 0.10;
 
 use strict;
 
@@ -26,14 +26,12 @@ sub rest {
 }
 
 sub _search_path {
-    my @PROB_PATHS = qw(
+    my @prob_paths = qw(
         /usr/bin/beep
         /usr/local/bin/beep
         /bin/beep
     );
-    for (@PROB_PATHS) {
-        return $_ if -e and -x _;
-    }
+    do { return $_ if -e and -x _ } for @prob_paths;
     return;
 }
 

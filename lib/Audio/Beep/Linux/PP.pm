@@ -1,6 +1,6 @@
 package Audio::Beep::Linux::PP;
 
-$Audio::Beep::Linux::PP::VERSION = 0.08;
+$Audio::Beep::Linux::PP::VERSION = 0.10;
 
 use strict;
 use Carp;
