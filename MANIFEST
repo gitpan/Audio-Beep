@@ -1,0 +1,20 @@
+Beep.pm
+Changes
+MANIFEST			This list of files
+Makefile
+Makefile.PL
+README
+beep-1.2.2/CHANGELOG
+beep-1.2.2/COPYING
+beep-1.2.2/CREDITS
+beep-1.2.2/INSTALL
+beep-1.2.2/Makefile
+beep-1.2.2/README
+beep-1.2.2/beep.1.gz
+beep-1.2.2/beep.c
+linux/Audio/Beep/Linux/PP.pm
+linux/Audio/Beep/Linux/beep.pm
+music/scales
+music/wtk1
+t/1.t
+win32/Audio/Beep/Win32/API.pm

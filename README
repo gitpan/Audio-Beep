@@ -1,4 +1,4 @@
-Audio::Beep version 0.04
+Audio::Beep version 0.05
 =================
 
 Audio::Beep - a module to use your computer beeper in fancy ways
@@ -15,9 +15,14 @@ To install this module type the following:
 
 DEPENDENCIES
 
-GNU/Linux operating system.
-It's better to have the beep program 
-(sources should be distributed in this tarball)
+Linux
+    GNU/Linux operating system.
+    It's better to have the beep program 
+    (sources should be distributed in this tarball)
+
+Windows
+    Windows NT, 2000 or XP.
+    Win32::API module.
 
 COPYRIGHT AND LICENCE
 

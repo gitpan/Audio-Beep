@@ -1,5 +1,13 @@
 Revision history for Perl extension Audio::Beep.
 
+0.05 Tue Feb 19 00:20:57 2003
+    - Added Audio::Beep::Win32::API player module
+        (now we work on NT, 2000 and XP)
+    - Updated Makefile.PL to install just required modules depending on OS
+    - Updated POD to account for Windows support
+    - Added scales sample in music/ directory
+    - Rewrote _best_player()
+
 0.04 Sun Feb 16 19:48:32 2003
     - Added a $beeper->rest($milliseconds) method
     - Rewrote parsing

@@ -1,6 +1,6 @@
 package Audio::Beep;
 
-$Audio::Beep::VERSION = 0.04;
+$Audio::Beep::VERSION = 0.05;
 
 use strict;
 use Carp;
@@ -143,17 +143,27 @@ sub _duration {
 }
 
 sub _best_player {
-    my $player;
-    if ($^O =~ /linux/i) {
-        if ( eval { require Audio::Beep::Linux::beep } ) {
-            $player = Audio::Beep::Linux::beep->new();
-            return $player if defined $player;
-        }
-        if ( eval { require Audio::Beep::Linux::PP } ) {
-            $player = Audio::Beep::Linux::PP->new();
-            return $player if defined $player;
+    my %os_modules = (
+        linux   =>  [
+            'Audio::Beep::Linux::beep',
+            'Audio::Beep::Linux::PP'
+        ],
+        win32   =>  [
+            'Audio::Beep::Win32::API'
+        ]
+    );
+    
+    no strict 'refs';
+    
+    for my $os (keys %os_modules) {
+        for my $mod ( @{ $os_modules{$os} } ) {
+            if ($^O =~ /$os/i and eval "require $mod") {
+                my $player = $mod->new();
+                return $player if defined $player;
+            }
         }
     }
+
     return;
 }
 
@@ -169,18 +179,6 @@ sub beep {
 =head1 NAME
 
 Audio::Beep - a module to use your computer beeper in fancy ways
-
-=head1 IMPORTANT!!!
-
-This module will work just with the GNU/Linux operating system!
-It requires either the "beep" program by Johnathan Nightingale 
-(you should find sources in this tarball) SUID root or you to be root (that's
-because we need writing access to the /dev/console device).
-If you don't have the "beep" program this library will also assume some kernel
-constants which may vary from kernel to kernel (or not, i'm no kernel expert).
-Anyway this was tested on a 2.4.20 kernel compiled for i386. 
-With the same kernel i have problems on my PowerBook G3 (it plays a continous
-single beep). See the C<rest> method if you'd like to play something anyway.
 
 =head1 SYNOPSIS
 
@@ -201,7 +199,7 @@ single beep). See the C<rest> method if you'd like to play something anyway.
                 # Pictures at an Exhibition by Modest Mussorgsky
 
     $beeper->play( $music );
-
+    
 =head1 USAGE
 
 =head2 Exported Functions
@@ -390,6 +388,28 @@ There should be extra examples in the "music" directory of this tarball.
 
                   #a louder beep
  perl -MAudio::Beep -ne 'print and beep(550, 1000) if /ERROR/i' logfile
+
+
+=head1 REQUIREMENTS
+
+=head2 Linux
+
+Requires either the "beep" program by Johnathan Nightingale 
+(you should find sources in this tarball) SUID root or you to be root (that's
+because we need writing access to the /dev/console device).
+If you don't have the "beep" program this library will also assume some kernel
+constants which may vary from kernel to kernel (or not, i'm no kernel expert).
+Anyway this was tested on a 2.4.20 kernel compiled for i386.
+With the same kernel i have problems on my PowerBook G3 (it plays a continous
+single beep). See the C<rest> method if you'd like to play something anyway.
+
+=head2 Windows
+
+Requires Windows NT, 2000 or XP and the Win32::API module. 
+You can find sources on CPAN. 
+Some PPM precompiled packages are at http://dada.perl.it/PPM/
+No support is available for Windows 95, 98 and ME yet:
+that would require some assembler and an XS module.
 
 =head1 BACKEND
 
