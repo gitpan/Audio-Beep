@@ -10,7 +10,7 @@ my $console;
 
 sub new {
     my $class = shift;
-    return {}, $class;
+    return bless {}, $class;
 }
 
 sub play {
@@ -63,6 +63,7 @@ No other option is available right now.
 
 You need to be root to play something using this module. 
 Otherwise your script should be SUID root (but i won't suggest that).
+Or you could own the tty where you execute this, but it cannot be an xterm.
 It's better to install the "beep" program by Johnathan Nightingale and 
 then SUID that small program.
 This module is just a rewriting of the core function of the "beep" program.
@@ -75,9 +76,9 @@ The CLOCK_TICK_RATE is also taken from "beep". Follows what you can read there:
  wonderful human named Raine M. Ekman used it in a program that played
  a tune at the console, and apparently, it's how the kernel likes its
  sound requests to be phrased.  If you see Raine, thank him for me.  
- 
+
  June 28, email from Peter Tirsek (peter at tirsek dot com):
- 
+
  This number represents the fixed frequency of the original PC XT's
  timer chip (the 8254 AFAIR), which is approximately 1.193 MHz. This
  number is divided with the desired frequency to obtain a counter value,

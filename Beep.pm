@@ -1,6 +1,6 @@
 package Audio::Beep;
 
-$Audio::Beep::VERSION = 0.02;
+$Audio::Beep::VERSION = 0.03;
 
 use strict;
 use Carp;
@@ -149,14 +149,14 @@ With the same kernel i have problems on my PowerBook G3.
 =head1 SYNOPSIS
 
     #functional simple way
-    use Beep;
+    use Audio::Beep;
 
     beep($freq, $milliseconds);
 
     #OO more musical way
-    use Beep;
+    use Audio::Beep;
 
-    my $beeper = Beep->new();
+    my $beeper = Audio::Beep->new();
     
                 #lilypond subset syntax accepted
     my $music = "g f bes c'8 f d4 c8 f d4 bes, c' g, f2";
@@ -172,9 +172,11 @@ With the same kernel i have problems on my PowerBook G3.
 
 =item beep([FREQUENCY], [DURATION]);
 
- Plays a customizable beep out of your computer beeper.
- FREQUENCY is in Hz. Defaults to 440.
- DURATION is in milliseconds. Defaults to 100.
+Plays a customizable beep out of your computer beeper.
+
+FREQUENCY is in Hz. Defaults to 440.
+
+DURATION is in milliseconds. Defaults to 100.
 
 =back
 
@@ -187,7 +189,9 @@ With the same kernel i have problems on my PowerBook G3.
 Returns a new "beeper" object. 
 Follows the available options for the new method to be passed in hash fashion.
 
-=over 4
+=back
+
+=over 8
 
 =item player => [player object]
 
@@ -200,6 +204,7 @@ personalize the player itself).
 
 =back
 
+=over 4
 
 =item $beeper->play( $music )
 
@@ -214,7 +219,9 @@ NB: if some part is missing the settings from the previous note are applied for 
 "Flatness", "Sharpness" and "Dottiness" are reset after each note. 
 The defaults at start are middle octave and a quarter length.
 
-=over 4
+=back
+
+=over 8
 
 =item note
 
@@ -247,7 +254,7 @@ So a4. is an A note long 1/4 + 1/8 and gis2.. is a G# long 7/8 (1/2 + 1/4 + 1/8)
 A r note means a rest. You can still use duration and dots parameters. 
 Flat and sharp will be ignored. Octave will work, changing the octave.
 
-=item spacial note: "bpm"
+=item special note: "bpm"
 
 You can use a bpm (beats per minute) "note" to change the tempo of the music. 
 The only parameter you can use is a number following the bpm string (like "bpm144"). 
@@ -268,24 +275,34 @@ The default is 120 BPM.
         es4
     EOM
 
-=back
+=over 4
 
 =item $beeper->player( [player] )
 
 Sets the player object that will be used to play your music.
-With no parameter it just give you back the current player.
+With no parameter it just gives you back the current player.
+
+=back
 
 =head1 EXAMPLES
 
                   #a louder beep
- perl -MBeep -ne 'print and beep(550, 1000) if /ERROR/' somelogfile
+ perl -MAudio::Beep -ne 'print and beep(550, 1000) if /ERROR/i' logfile
 
 =head1 BACKEND
 
+If you are a developer interested in having Audio::Beep working on your
+platform, you should think about writing a backend module.
 A backend module for Beep should offer just a couple of methods:
- NB: FREQUENCY is in Hertz. DURATION in milliseconds
- 
+
+NB: FREQUENCY is in Hertz. DURATION in milliseconds
+
 =over 4
+
+=item new([%options])
+
+This is kinda obvious. Take in the options you like. Keep the hash fashion
+for parameters, thanks.
 
 =item play(FREQUENCY, DURATION)
 
@@ -303,14 +320,12 @@ This module works for me, but if someone wants to help here is some cool stuff t
 
     - an XS backend
     - an XS Windoze backend (and other OSs)
-    - a parse method to preparse the input (usefull??)
-    - with a cool backend we could export a tied filehandle 
-      to which it would be possible to write directly from Perl
 
 =head1 BUGS
 
- Sure to be plenty.
- Produces a ton of crap if warnings are turned on.
+Sure to be plenty.
+
+Produces a ton of crap if warnings are turned on.
 
 =head1 COPYRIGHT
 

@@ -49,7 +49,7 @@ The new class method can receive as option in hash fashion the following
 directives
 
 =over 4
-    
+
 =item path => '/full/path/to/beep'
 
 With the path option you can give your full path to the "beep" program to
@@ -62,7 +62,7 @@ in some likely places where "beep" should be before returning undef.
 
 The "beep" program is a Linux program wrote by Johnathan Nightingale.
 You should find C sources in the tarball where you found this file.
-The "beep" program needs to be executed as root to actually work.
+The "beep" program needs to be (usually) executed as root to actually work.
 Please check "beep" man page for more info.
 
 =head1 BUGS

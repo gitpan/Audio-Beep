@@ -1,5 +1,9 @@
 Revision history for Perl extension Audio::Beep.
 
+0.03  Fri Feb 14 14:25:54 2003
+    - Fixed a missing bless in Audio::Beep::Linux::PP
+    - Fixed POD
+
 0.02  Thu Feb 13 18:40:05 2003
     - Changed namespace to Audio::Beep
     - Moved Beep::beep module to Audio::Beep::Linux::beep
