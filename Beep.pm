@@ -1,6 +1,6 @@
 package Audio::Beep;
 
-$Audio::Beep::VERSION = 0.03;
+$Audio::Beep::VERSION = 0.04;
 
 use strict;
 use Carp;
@@ -33,9 +33,9 @@ use vars qw(%NOTES @PITCH @EXPORT @EXPORT_OK @ISA);
 sub new {
     my $class = shift;
     my (%hash) = @_;
-    $hash{player} ||= _best_player();
-    carp "No player found for this platform. 
-          You should specify one before paying anything." unless $hash{player};
+    $hash{player} ||=  _best_player();
+    carp "No player found. You should specify one before playing anything." 
+        unless $hash{player};
     return bless \%hash, $class;
 }
 
@@ -46,45 +46,80 @@ sub player {
     return $self->{player};
 }
 
+sub rest {
+    my $self = shift;
+    my ($rest) = @_;
+    $self->{rest} = $rest if defined $rest;
+    return $self->{rest};
+}
+
 sub play {
     my $self = shift;
     my ($music) = @_;
+    
     my %p = (
+        note        =>  'c',
         duration    =>  4,
         octave      =>  0,
         bpm         =>  120,
         pitch_mod   =>  0,
         dot         =>  0,
+        relative    =>  1,
+        transpose   =>  0,
     );
-    for (split /\s+/, $music) {
-        $p{bpm} = $1 and next if (/^bpm(\d+)/);
+    
+    while ($music =~ /\G(?:([^\s#]+)\s*|#[^\n]*\n|\s*)/g) { 
+        local $_ = $1 or next;
         
-        my ($note, $mod, $octave, $dur, $dot) = 
-            /^([cdefgabr])(is|es|s)?([',]+)?(\d+)?(\.+)?/;
-        
-        unless ($note) {
-            print STDERR qq|Atom "$_" is unparsable\n| if $^W;
+        if ( /^\\(.+)/ ) {
+            COMMAND: {
+                local $_ = $1;
+                /^(?:bpm|tempo)(\d+)/   and do {$p{bpm} = $1; last};
+                /^rel/                  and do {$p{relative} = 1; last};
+                /^norel/                and do {$p{relative} = 0; last};
+                /^transpose([',]+)/     and do {
+                    local $_ = $1;
+                    $p{transpose} = tr/'/'/ - tr/,/,/;
+                    last;
+                };
+                carp qq|Command "$_" is unparsable\n| if $^W;
+            }
             next;
         }
         
-        $p{note} = $note;
+        my ($note, $mod, $octave, $dur, $dot) = 
+            /^\W*([cdefgabr])(is|es|s)?([',]+)?(\d+)?(\.+)?\W*$/;
         
-        $p{pitch_mod} = 0;
-        $p{pitch_mod} = 1  if $mod eq 'is';
-        $p{pitch_mod} = -1 if $mod eq 'es' or $mod eq 's';
+        unless ($note) {
+            carp qq|Note "$_" is unparsable\n| if $^W;
+            next;
+        }
         
-        $p{octave} += tr/'/'/ - tr/,/,/ for $octave;
-
         $p{duration} = $dur if $dur;
 
         $p{dot} = 0;
-        $p{dot} += tr/././ for $dot;
+        do{ $p{dot} += tr/././ for $dot } if $dot;
         
-        if ($p{note} eq 'r') {
+        if ( $note eq 'r' ) {
             $self->player->rest( _duration(\%p) );
         } else {
+            if ( $p{relative} ) {
+                my $diff = $NOTES{ $p{note} } - $NOTES{ $note };
+                $p{octave} += $diff < 0 ? -1 : 1 if abs $diff > 5;
+            } else {
+                $p{octave} = $p{transpose};
+            }
+        
+            do{ $p{octave} += tr/'/'/ - tr/,/,/ for $octave } if $octave;
+        
+            $p{pitch_mod} = 0;
+            $p{pitch_mod} = $mod eq 'is' ? 1 : -1 if $mod;
+        
+            $p{note} = $note;
             $self->player->play( _pitch(\%p), _duration(\%p) );
         }
+        
+        select undef, undef, undef, $self->rest / 1000 if $self->rest;
     }
 }
 
@@ -144,7 +179,8 @@ because we need writing access to the /dev/console device).
 If you don't have the "beep" program this library will also assume some kernel
 constants which may vary from kernel to kernel (or not, i'm no kernel expert).
 Anyway this was tested on a 2.4.20 kernel compiled for i386. 
-With the same kernel i have problems on my PowerBook G3.
+With the same kernel i have problems on my PowerBook G3 (it plays a continous
+single beep). See the C<rest> method if you'd like to play something anyway.
 
 =head1 SYNOPSIS
 
@@ -158,8 +194,10 @@ With the same kernel i have problems on my PowerBook G3.
 
     my $beeper = Audio::Beep->new();
     
-                #lilypond subset syntax accepted
-    my $music = "g f bes c'8 f d4 c8 f d4 bes, c' g, f2";
+                # lilypond subset syntax accepted
+                # relative notation is the default 
+                # (now correctly implemented)
+    my $music = "g' f bes' c8 f d4 c8 f d4 bes c g f2";
                 # Pictures at an Exhibition by Modest Mussorgsky
 
     $beeper->play( $music );
@@ -202,26 +240,65 @@ The new method will try to look up the best player on your platform.
 Still passing the player to the new method is safer (and you can sometimes
 personalize the player itself).
 
+=item rest => [ms]
+
+Sets the rest in milliseconds between every sound played (and
+even pause). This is useful for users which computer beeper has problems
+and would just stick to the first sound played.
+For example on my PowerbookG3 i have to set this around 120 milliseconds.
+In that way i can still hear some music. Otherwise is just a long single beep.
+
 =back
 
 =over 4
 
 =item $beeper->play( $music )
 
-Plays the "music" written in $music. 
-The accepted format is a subset of lilypond.org syntax. 
+Plays the "music" written in $music.
+The accepted format is a subset of lilypond.org syntax.
 The string is a space separated list of notes to play.
+See the NOTATION section below for more info.
+
+=item $beeper->player( [player] )
+
+Sets the player object that will be used to play your music.
+With no parameter it just gives you back the current player.
+
+=item $beeper->rest( [ms] )
+
+Sets the extra rest between each note. 
+See the rest option above at the C<new> method for more info.
+With no parameter it gives you back the current rest.
+
+=back
+
+=head1 NOTATION
+
+The defaults at start are middle octave C and a quarter length.
+Standard notation is the relative notation. 
+Here is an explanation from Lilypond documentation:
+
+    If no octave changing marks are used, the basic interval between 
+    this and the last note is always taken to be a fourth or less 
+    (This distance is determined without regarding alterations; 
+    a fisis following a ceses will be put above the ceses)
+
+    The octave changing marks ' and , can be added to raise or lower 
+    the pitch by an extra octave.
+
+You can switch from relative to non relative notation (in which you specify for
+every note the octave) using the C<\norel> and C<\rel> commands (see below)
+
+=head2 Notes
+
 Every note has the following structure:
     
     [note][flat|sharp][octave][duration][dots]
 
-NB: if some part is missing the settings from the previous note are applied for octave and duration. 
+NB: previous note duration is used if omitted.
 "Flatness", "Sharpness" and "Dottiness" are reset after each note. 
-The defaults at start are middle octave and a quarter length.
 
-=back
-
-=over 8
+=over 4
 
 =item note
 
@@ -236,7 +313,6 @@ A flat note is produced adding a "es" or "s"
 
 =item octave
 
-The octave setting is always relative to the previous one. 
 A ' (apostrophe) raise one octave, while a , (comma) lower it.
 
 =item duration
@@ -252,37 +328,63 @@ So a4. is an A note long 1/4 + 1/8 and gis2.. is a G# long 7/8 (1/2 + 1/4 + 1/8)
 =item special note: "r"
 
 A r note means a rest. You can still use duration and dots parameters. 
-Flat and sharp will be ignored. Octave will work, changing the octave.
-
-=item special note: "bpm"
-
-You can use a bpm (beats per minute) "note" to change the tempo of the music. 
-The only parameter you can use is a number following the bpm string (like "bpm144"). 
-The default is 120 BPM.
 
 =back
 
-=head2 Music Examples
+=head2 Special Commands
 
-    my $music = <<EOM; # a Smashing Pumpkins tune
-    bpm90   d''8 a, e' a, d' a, fis'16 d a,8
-            d'   a, e' a, d' a, fis'16 d a,8
-    EOM
-
-    my $music = <<EOM; # some Bach
-        r'8 c16 b c8 g as     c16 b c8 d
-        g,  c16 b c8 d f,16 g as4      g16 f
-        es4
-    EOM
+Special commands always begin with a "\". They change the behavior of the
+parser or the music played. Unlike in the Lilypond original syntax, these
+commands are embedded between notes so they have a slightly different syntax.
 
 =over 4
 
-=item $beeper->player( [player] )
+=item \bpm(\d+)
 
-Sets the player object that will be used to play your music.
-With no parameter it just gives you back the current player.
+You can use this option  to change the tempo of the music.
+The only parameter you can use is a number following the bpm string 
+(like "bpm144").  
+BPM stands for Beats Per Minute.
+The default is 120 BPM.
+You can also invoke this command as C<\tempo>
+
+=item \norel
+
+Switches the relative mode off. From here afterward you have to always specify
+the octave where the note is.
+
+=item \rel
+
+Switches the relative mode on. This is the default.
+
+=item \transpose([',]+)
+
+You can transpose all your music up or down some octave. 
+' (apostrophe) raise octave. , (comma) lowers it. This has effect just
+if you are in non-relative mode.
 
 =back
+
+=head2 Comments
+
+You can embed comments in your music the Perl way. Everything after a #
+will be ignored
+
+=head2 Music Examples
+
+    my $scale = <<EOS;
+    \rel \bpm144
+    c d e f g a b c2. r4    # a scale going up
+    c b a g f e d c1        # and then down
+    EOS
+
+    my $music = <<EOM; # a Smashing Pumpkins tune
+    \bpm90 \norel \transpose''
+        d8 a, e a, d a, fis16 d a,8
+        d  a, e a, d a, fis16 d a,8
+    EOM
+
+There should be extra examples in the "music" directory of this tarball.
 
 =head1 EXAMPLES
 
@@ -318,14 +420,13 @@ Rests a DURATION amount of time
 
 This module works for me, but if someone wants to help here is some cool stuff to do:
 
-    - an XS backend
-    - an XS Windoze backend (and other OSs)
+- an XS backend
+
+- an XS Windoze backend (look at the Prima project for some useful code)
 
 =head1 BUGS
 
-Sure to be plenty.
-
-Produces a ton of crap if warnings are turned on.
+Some of course.
 
 =head1 COPYRIGHT
 

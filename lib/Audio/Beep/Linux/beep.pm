@@ -1,5 +1,7 @@
 package Audio::Beep::Linux::beep;
 
+$Audio::Beep::Linux::beep::VERSION = 0.04;
+
 use strict;
 
 sub new {

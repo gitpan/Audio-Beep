@@ -1,5 +1,19 @@
 Revision history for Perl extension Audio::Beep.
 
+0.04 Sun Feb 16 19:48:32 2003
+    - Added a $beeper->rest($milliseconds) method
+    - Rewrote parsing
+    - Added \ in front of all methods 
+        (breaking compatibility with previous versions)
+    - Added \rel, \norel e \transpose
+    - Implemented relative noting the right way 
+        (again breaking compatibility)
+    - Added comments with #
+    - More POD
+    - Updated the samples in the POD
+    - Added a sample in music/ directory
+    - Probably other stuff
+
 0.03  Fri Feb 14 14:25:54 2003
     - Fixed a missing bless in Audio::Beep::Linux::PP
     - Fixed POD

@@ -1,5 +1,7 @@
 package Audio::Beep::Linux::PP;
 
+$Audio::Beep::Linux::PP::VERSION = 0.04;
+
 use strict;
 use Carp;
 use IO::File;
