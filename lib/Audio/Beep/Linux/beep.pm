@@ -1,6 +1,6 @@
 package Audio::Beep::Linux::beep;
 
-$Audio::Beep::Linux::beep::VERSION = 0.10;
+$Audio::Beep::Linux::beep::VERSION = 0.11;
 
 use strict;
 
@@ -15,7 +15,7 @@ sub new {
 sub play {
     my $self = shift;
     my ($pitch, $duration) = @_;
-    return `$self->{path} -l $duration -f $pitch`;
+    return `\Q$self->{path}\E -l $duration -f $pitch`;
 }
 
 sub rest {
@@ -37,7 +37,7 @@ sub _search_path {
 
 =head1 NAME
 
-Audio::Beep::Linux::beep - Audio::Beep player module using the "beep" program
+Audio::Beep::Linux::beep - Audio::Beep player module using the B<beep> program
 
 =head1 SYNOPIS
 
@@ -45,25 +45,25 @@ Audio::Beep::Linux::beep - Audio::Beep player module using the "beep" program
 
 =head1 USAGE
 
-The new class method can receive as option in hash fashion the following
+The C<new> class method can receive as option in hash fashion the following
 directives
 
 =over 4
 
 =item path => '/full/path/to/beep'
 
-With the path option you can give your full path to the "beep" program to
+With the path option you can set the full path to the B<beep> program in
 the object. If you don't use this option the new method will look anyway
-in some likely places where "beep" should be before returning undef.
+in some likely places where B<beep> should be before returning undef.
 
 =back
 
 =head1 NOTES
 
-The "beep" program is a Linux program wrote by Johnathan Nightingale.
+The B<beep> program is a Linux program wrote by Johnathan Nightingale.
 You should find C sources in the tarball where you found this file.
-The "beep" program needs to be (usually) executed as root to actually work.
-Please check "beep" man page for more info.
+The B<beep> program needs to be (usually) executed as root to actually work.
+Please check C<beep(1)> for more info.
 
 =head1 BUGS
 
@@ -71,7 +71,7 @@ None known.
 
 =head1 COPYRIGHT
 
-Copyright 2003 Giulio Motta <giulienk@cpan.org>.
+Copyright 2003-2004 Giulio Motta L<giulienk@cpan.org>.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -1,6 +1,6 @@
 package Audio::Beep::Win32::API;
 
-$Audio::Beep::Win32::API::VERSION = 0.10;
+$Audio::Beep::Win32::API::VERSION = 0.11;
 
 use strict;
 use Carp;
@@ -40,10 +40,11 @@ Audio::Beep::Win32::API - Audio::Beep player using Win32 API call
 
 This player makes a call to the Windows API. 
 It works only on NT, 2000 or XP. 
-Windows 95/98/ME have this API call but does another thing (plays a standard beep).
+Windows 95/98/ME have this API call but does another thing 
+(plays a standard beep).
 
 Requires Win32::API module. You can find sources on CPAN.
-Some PPM precompiled packages can be found at http://dada.perl.it/PPM/
+Some PPM precompiled packages can be found at L<http://dada.perl.it/PPM/>
 
 =head1 BUGS
 
@@ -51,7 +52,7 @@ This module is not thoroughly tested. Please report any bug you may find.
 
 =head1 COPYRIGHT
 
-Copyright 2003 Giulio Motta <giulienk@cpan.org>.
+Copyright 2003-2004 Giulio Motta L<giulienk@cpan.org>.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -1,6 +1,6 @@
 package Audio::Beep::Linux::PP;
 
-$Audio::Beep::Linux::PP::VERSION = 0.10;
+$Audio::Beep::Linux::PP::VERSION = 0.11;
 
 use strict;
 use Carp;
@@ -56,7 +56,7 @@ Audio::Beep::Linux::PP - PurePerl implementation of an Audio::Beep player
 
 =head1 USAGE
 
-The new class method will return you a new player object.
+The C<new> class method will return you a new player object.
 No other option is available right now.
 
 =head1 NOTES
@@ -64,13 +64,14 @@ No other option is available right now.
 You need to be root to play something using this module. 
 Otherwise your script should be SUID root (but i won't suggest that).
 Or you could own the tty where you execute this, but it cannot be an xterm.
-It's better to install the "beep" program by Johnathan Nightingale and 
+It's better to install the B<beep> program by Johnathan Nightingale and 
 then SUID that small program.
-This module is just a rewriting of the core function of the "beep" program.
+This module is just a rewriting of the core function of the B<beep> program.
 I took everything from there so credit goes again to Johnathan Nightingale.
 As this is a PurePerl module i had to do some assumption, like the 
 KIOCSOUND constant to be 0x4B2F (which may not be your case).
-The CLOCK_TICK_RATE is also taken from "beep". Follows what you can read there:
+The CLOCK_TICK_RATE is also taken from B<beep>.
+Follows what you can read there:
 
  I don't know where this number comes from, I admit that freely.  A 
  wonderful human named Raine M. Ekman used it in a program that played
@@ -94,7 +95,7 @@ None known.
 
 =head1 COPYRIGHT
 
-Copyright 2003 Giulio Motta <giulienk@cpan.org>.
+Copyright 2003-2004 Giulio Motta L<giulienk@cpan.org>.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

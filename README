@@ -1,4 +1,4 @@
-Audio::Beep version 0.10
+Audio::Beep version 0.11
 =================
 
 Audio::Beep - a module to use your computer beeper in fancy ways
@@ -24,9 +24,13 @@ Windows
     Windows NT, 2000 or XP.
     Win32::API module.
 
+BSD
+    Please test it on various BSDs, let me know what works and what not
+    Requires the beep program by Andrew Stevenson
+
 COPYRIGHT AND LICENCE
 
-Copyright 2003 Giulio Motta giulienk@cpan.org.
+Copyright 2003-2004 Giulio Motta giulienk@cpan.org.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
