@@ -1,5 +1,11 @@
 Revision history for Perl extension Audio::Beep.
 
+0.07 Tue Feb 25 00:34:19 2003
+    - Now we install no submodules on not supported OSs
+    - lazier way to set the player object and more POD on the subject
+    - some more carping and croaking
+    - new one-liner examples in POD
+
 0.06 Fri Feb 21 10:35:11 2003
     - local $SIG{INT} in Audio::Beep::Linux::PP
     - fixed serious bug in Makefile.PL

@@ -1,6 +1,6 @@
 package Audio::Beep;
 
-$Audio::Beep::VERSION = 0.06;
+$Audio::Beep::VERSION = 0.07;
 
 use strict;
 use Carp;
@@ -9,6 +9,9 @@ use vars qw(%NOTES @PITCH @EXPORT @EXPORT_OK @ISA);
 @ISA        = qw(Exporter);
 @EXPORT     = qw(beep);
 @EXPORT_OK  = qw(beep);
+
+
+### GLOBALS
 
 %NOTES = (
     c   =>  0,
@@ -30,19 +33,28 @@ use vars qw(%NOTES @PITCH @EXPORT @EXPORT_OK @ISA);
     493.8,
 );
 
+
+### OO METHODS
+
 sub new {
     my $class = shift;
-    my (%hash) = @_;
-    $hash{player} ||=  _best_player();
+    carp "Odd number of parameters where hash expected" if @_ % 2 and $^W;
+    my (%h) = @_;
+    if ( $h{player} ) {
+        $h{player} = _player_from_string( $h{player} ) unless ref $h{player};
+    } else {
+        $h{player} =  _best_player();
+    }
     carp "No player found. You should specify one before playing anything." 
-        unless $hash{player};
-    return bless \%hash, $class;
+        unless $h{player};
+    return bless \%h, $class;
 }
 
 sub player {
     my $self = shift;
     my ($player) = @_;
-    $self->{player} = $player if $player;
+    $self->{player} = ref $player ? $player : _player_from_string($player) 
+                                                                    if $player;
     return $self->{player};
 }
 
@@ -119,9 +131,12 @@ sub play {
             $self->player->play( _pitch(\%p), _duration(\%p) );
         }
         
-        select undef, undef, undef, $self->rest / 1000 if $self->rest;
+        select undef, undef, undef, $self->{rest} / 1000 if $self->{rest};
     }
 }
+
+
+### UTILITIES
 
 sub _pitch {
     my $p = shift;
@@ -167,12 +182,24 @@ sub _best_player {
     return;
 }
 
+sub _player_from_string {
+    my ($mod) = @_;
+    my $pack = __PACKAGE__;
+    $mod =~ s/^(${pack}::)?/${pack}::/;
+    eval "require $mod" or croak "Cannot load $mod : $@";
+    no strict 'refs';
+    return $mod->new();
+}
+
+
+### EXPORTED FUNCTIONS
 
 sub beep {
     my ($pitch, $duration) = @_;
     $pitch      ||= 440;
     $duration   ||= 100;
-    _best_player()->play($pitch, $duration);
+    my $player = _best_player() or croak "Couldn't find a working player";
+    $player->play($pitch, $duration);
 }
 
 
@@ -229,14 +256,42 @@ Follows the available options for the new method to be passed in hash fashion.
 
 =over 8
 
-=item player => [player object]
+=item player => [player object | player module]
 
 You can initialize your player object and then give it to the 
-Audio::Beep object. 
-Player objects come from Audio::Beep submodules (like Audio::Beep::Linux::beep).
-The new method will try to look up the best player on your platform.
-Still passing the player to the new method is safer (and you can sometimes
-personalize the player itself).
+Audio::Beep object.
+Player objects come from Audio::Beep submodules (like
+Audio::Beep::Linux::beep). 
+If you're lazy (as any good programmer should be) 
+you can give a string as a player,
+like C<"Audio::Beep::Linux::PP"> or even just C<"Linux::PP">: the method
+will prepend the C<Audio::Beep> namespace, require the module and call
+the new method on it for you.
+The new method will try to look up the best player
+on your platform if you don't specify one.
+So the following is all valid:
+
+    use Audio::Beep;
+    
+    #super lazy (should do the right thing most of the time)
+    my $beeper = Audio::Beep->new();
+    
+    #still lazy
+    my $beeper2 = Audio::Beep->new(player => 'Linux::PP');
+
+    #medium lazy
+    my $beeper3 = Audio::Beep->new(
+        player  => 'Audio::Beep::Win32::API'
+    );
+
+    #not so lazy, but more versatile
+    require Audio::Beep::Linux::beep;
+    my $beeper4 = Audio::Beep->new(
+        player  => Audio::Beep::Linux::beep->new(
+            path    =>  '/home/foo/bin/beep/'
+        )
+    );
+
 
 =item rest => [ms]
 
@@ -260,6 +315,7 @@ See the NOTATION section below for more info.
 =item $beeper->player( [player] )
 
 Sets the player object that will be used to play your music.
+See the player option above at the C<new> method for more info.
 With no parameter it just gives you back the current player.
 
 =item $beeper->rest( [ms] )
@@ -386,8 +442,14 @@ There should be extra examples in the "music" directory of this tarball.
 
 =head1 EXAMPLES
 
-                  #a louder beep
+ #a louder beep
  perl -MAudio::Beep -ne 'print and beep(550, 1000) if /ERROR/i' logfile
+
+ #turn your PC in Hofmann mode (courtesy of Thomas Klausner)
+ perl -MAudio::Beep -e 'beep(21 + rand 1000, rand 300) while 1'
+
+ #your new music player
+ perl -mAudio::Beep -0777e 'Audio::Beep->new->play(<>)' musicfile
 
 
 =head1 REQUIREMENTS
@@ -438,7 +500,8 @@ Rests a DURATION amount of time
 
 =head1 TODO
 
-This module works for me, but if someone wants to help here is some cool stuff to do:
+This module works for me, but if someone wants to help here is some cool stuff
+to do:
 
 - an XS backend
 
