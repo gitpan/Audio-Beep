@@ -1,0 +1,12 @@
+Revision history for Perl extension Audio::Beep.
+
+0.02  Thu Feb 13 18:40:05 2003
+    - Changed namespace to Audio::Beep
+    - Moved Beep::beep module to Audio::Beep::Linux::beep
+    - New module Audio::Beep::Linux::PP
+    - A ton of other stuff
+
+0.01  Tue Feb 11 18:20:12 2003
+	- original version; created by h2xs 1.22 with options
+		-XA -n Beep
+
