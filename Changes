@@ -1,5 +1,14 @@
 Revision history for Perl extension Audio::Beep.
 
+0.08 Wed Feb 26 10:23:41 2003
+    - In _best_player() we were "trying to club someone to dead 
+        with a loaded uzi": now we use bullets (thanks to perlport)
+    - Audio::Beep::Win32::API now use native Win32::Sleep
+        (more of a proof of concept)
+    - in Audio::Beep::Linux::PP, $console reduced its scope to the play method 
+        (thanks to a closure)
+    - now we warn if it's going to install on a non-compatible Windows
+
 0.07 Tue Feb 25 00:34:19 2003
     - Now we install no submodules on not supported OSs
     - lazier way to set the player object and more POD on the subject

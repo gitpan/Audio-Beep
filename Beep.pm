@@ -1,6 +1,6 @@
 package Audio::Beep;
 
-$Audio::Beep::VERSION = 0.07;
+$Audio::Beep::VERSION = 0.08;
 
 use strict;
 use Carp;
@@ -163,19 +163,17 @@ sub _best_player {
             'Audio::Beep::Linux::beep',
             'Audio::Beep::Linux::PP'
         ],
-        win32   =>  [
+        MSWin32   =>  [
             'Audio::Beep::Win32::API'
         ]
     );
     
     no strict 'refs';
     
-    for my $os (keys %os_modules) {
-        for my $mod ( @{ $os_modules{$os} } ) {
-            if ($^O =~ /$os/i and eval "require $mod") {
-                my $player = $mod->new();
-                return $player if defined $player;
-            }
+    for my $mod ( @{ $os_modules{$^O} } ) {
+        if (eval "require $mod") {
+            my $player = $mod->new();
+            return $player if defined $player;
         }
     }
 
@@ -422,7 +420,7 @@ if you are in non-relative mode.
 =head2 Comments
 
 You can embed comments in your music the Perl way. Everything after a #
-will be ignored
+will be ignored until end of line.
 
 =head2 Music Examples
 
@@ -506,6 +504,8 @@ to do:
 - an XS backend
 
 - an XS Windoze backend (look at the Prima project for some useful code)
+
+- some work is needed on Windows Makefile part
 
 =head1 BUGS
 

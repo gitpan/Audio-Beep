@@ -1,14 +1,12 @@
 package Audio::Beep::Linux::PP;
 
-$Audio::Beep::Linux::PP::VERSION = 0.06;
+$Audio::Beep::Linux::PP::VERSION = 0.08;
 
 use strict;
 use Carp;
 use IO::File;
 use constant KIOCSOUND          =>  0x4B2F;     #from linux/kd.h
 use constant CLOCK_TICK_RATE    =>  1193180;    #a magic number - see NOTES
-
-my $console;
 
 sub new {
     my $class = shift;
@@ -18,7 +16,8 @@ sub new {
 sub play {
     my $self = shift;
     my ($freq, $duration) = @_;
-    local $SIG{INT} = \&_sigint;
+    my $console;
+    local $SIG{INT} = sub { _sigint( $console ) };
     $console = IO::File->new("/dev/console", O_WRONLY) 
         or confess "Cannot open console: $!";
     ioctl($console, KIOCSOUND, int(CLOCK_TICK_RATE / $freq)) 
@@ -38,6 +37,7 @@ sub rest {
 }
 
 sub _sigint {
+    my $console = shift;
     if (defined $console) {
         ioctl($console, KIOCSOUND, 0)
             or confess "Call to ioctl failed: $!";

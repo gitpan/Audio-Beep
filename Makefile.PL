@@ -3,10 +3,12 @@ use ExtUtils::MakeMaker;
 my %prereq = ();
 my @libs = ();
 
-if ($^O =~ /win32/i) {
+if ($^O eq 'MSWin32') {
+    warn "Currently the only Windows systems supported are NT, 2000 and XP"
+        unless Win32::GetOSVersion() == 2;
     $prepreq{'Win32::API'} = 0;
     @libs = ('lib/Audio/Beep/Win32/');
-} elsif ($^O =~ /linux/i) {
+} elsif ($^O eq 'linux') {
     @libs = ('lib/Audio/Beep/Linux/');
 } else {
     warn "Your operating system is not supported: 

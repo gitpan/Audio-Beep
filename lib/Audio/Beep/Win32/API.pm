@@ -1,6 +1,6 @@
 package Audio::Beep::Win32::API;
 
-$Audio::Beep::Win32::API::VERSION = 0.06;
+$Audio::Beep::Win32::API::VERSION = 0.08;
 
 use strict;
 use Carp;
@@ -24,7 +24,7 @@ sub play {
 sub rest {
     my $self = shift;
     my ($duration) = @_;
-    select undef, undef, undef, $duration / 1000;
+    Win32::Sleep( $duration );
     return 1;
 }
 

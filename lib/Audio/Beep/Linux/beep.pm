@@ -1,6 +1,6 @@
 package Audio::Beep::Linux::beep;
 
-$Audio::Beep::Linux::beep::VERSION = 0.06;
+$Audio::Beep::Linux::beep::VERSION = 0.08;
 
 use strict;
 
